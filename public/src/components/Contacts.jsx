@@ -9,7 +9,12 @@ export default function Contacts({ contacts, currentUser, changeChat }) {
   const [currentUserName, setCurrentUserName] = useState(undefined);
   const [currentUserImage, setCurrentUserImage] = useState(undefined);
   const [currentSelected, setCurrentSelected] = useState(undefined);
-  const [activeButton, setActiveButton] = useState("users");
+  const [selectedTab, setSelectedTab] = useState("users");
+
+  const handleClick = (tab) => {
+    setSelectedTab(tab);
+  };
+  
   useEffect(() => {
     if(currentUser) {
       setCurrentUserImage(currentUser.avatarImage);
@@ -31,11 +36,7 @@ export default function Contacts({ contacts, currentUser, changeChat }) {
               <img src={Logo} alt="logo" />
               <h3>Adamas</h3>
             </div>
-            <ContactButtons
-  onClickUsers={() => setActiveButton("users")}
-  onClickCommunities={() => setActiveButton("communities")}
-  onClickCreate={() => console.log("Create Community")}
-/>
+            <ContactButtons />
             <div className="contacts">
               {
                contacts.map((contact, index) => {
