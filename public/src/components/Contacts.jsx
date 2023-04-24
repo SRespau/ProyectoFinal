@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Logo from "../assets/logo.svg";
+import ContactButtons from "./ContactButtons";
 
 // La función recibe como props los contactos y el usuario actual
 export default function Contacts({ contacts, currentUser, changeChat }) {
@@ -8,7 +9,7 @@ export default function Contacts({ contacts, currentUser, changeChat }) {
   const [currentUserName, setCurrentUserName] = useState(undefined);
   const [currentUserImage, setCurrentUserImage] = useState(undefined);
   const [currentSelected, setCurrentSelected] = useState(undefined);
-
+  const [activeButton, setActiveButton] = useState("users");
   useEffect(() => {
     if(currentUser) {
       setCurrentUserImage(currentUser.avatarImage);
@@ -20,6 +21,7 @@ export default function Contacts({ contacts, currentUser, changeChat }) {
     setCurrentSelected(index);
     changeChat(contact);
   }
+  // DEBAJO DE CONTACT BUTTONS HABRÍA QUE HACER UNA CONDICIONAL. SI SE PRETA UN BOTON QUE SALGAN LOS USUARIOS Y SI NO LAS COMUNIDADES
   return (
     <>
       {
@@ -27,8 +29,13 @@ export default function Contacts({ contacts, currentUser, changeChat }) {
           <Container>
             <div className="brand">
               <img src={Logo} alt="logo" />
-              <h3>Snappy</h3>
+              <h3>Adamas</h3>
             </div>
+            <ContactButtons
+  onClickUsers={() => setActiveButton("users")}
+  onClickCommunities={() => setActiveButton("communities")}
+  onClickCreate={() => console.log("Create Community")}
+/>
             <div className="contacts">
               {
                contacts.map((contact, index) => {
@@ -47,6 +54,7 @@ export default function Contacts({ contacts, currentUser, changeChat }) {
               }
               
             </div>
+            
             <div className="current-user">
               <div className="avatar">
                 <img src={`data:image/svg+xml;base64,${currentUserImage}`} alt="avatar" />
@@ -56,6 +64,7 @@ export default function Contacts({ contacts, currentUser, changeChat }) {
                 <h2>{currentUserName}</h2>
               </div>
             </div>
+            
           </Container>
         )
       }
@@ -65,7 +74,7 @@ export default function Contacts({ contacts, currentUser, changeChat }) {
 
 const Container = styled.div`
   display: grid;
-  grid-template-rows: 10% 75% 15%;
+  grid-template-rows: 10% 7% 68% 15%;
   overflow: hidden;
   background-color: #080420;
   .brand {
