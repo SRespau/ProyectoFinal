@@ -11,6 +11,7 @@ import { io } from "socket.io-client";
 function Chat () {
   const socket = useRef();
   const [contacts, setContacts] = useState([]);
+  const [communities, setCommunities] = useState([]);
   const [currentUser, setCurrentUser] = useState(undefined);
   const [currentChat, setCurrentChat] = useState(undefined);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -47,6 +48,8 @@ function Chat () {
             try {
                 const data = await axios.get(`${allUsersRoute}/${currentUser._id}`);
                 setContacts(data.data);
+                const communities = await axios.get(`${allUsersRoute}/${currentUser._id}`);
+                setContacts(communities.data);
             } catch (error) {
                 console.log(error);
             }

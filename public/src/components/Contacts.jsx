@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Logo from "../assets/logo.svg";
 import ContactButtons from "./ContactButtons";
+// Chat GPT
+import { getUsers } from '../controllers/userController';
+import { getCommunities } from '../controllers/communityController';
 
 // La función recibe como props los contactos y el usuario actual
 export default function Contacts({ contacts, currentUser, changeChat }) {
@@ -9,7 +12,10 @@ export default function Contacts({ contacts, currentUser, changeChat }) {
   const [currentUserName, setCurrentUserName] = useState(undefined);
   const [currentUserImage, setCurrentUserImage] = useState(undefined);
   const [currentSelected, setCurrentSelected] = useState(undefined);
+  // ChatGPT
   const [selectedTab, setSelectedTab] = useState("users");
+
+  
 
   const handleClick = (tab) => {
     setSelectedTab(tab);

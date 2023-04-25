@@ -1,6 +1,6 @@
-const Community = require("../models/community");
+const Community = require("../model/communityModel");
 
-exports.createCommunity = async (req, res) => {
+module.exports.createCommunity = async (req, res, next) => {
   try {
     const { name } = req.body;
     const creator = req.user.id;
@@ -9,13 +9,12 @@ exports.createCommunity = async (req, res) => {
     await community.save();
 
     res.status(201).json(community);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+  } catch (ex) {
+    next(ex);
   }
 };
 
-exports.joinCommunity = async (req, res) => {
+module.exports.joinCommunity = async (req, res) => {
   try {
     const community = await Community.findById(req.params.communityId);
     if (!community) {
@@ -36,7 +35,7 @@ exports.joinCommunity = async (req, res) => {
   }
 };
 
-exports.getCommunityMessages = async (req, res) => {
+module.exports.getCommunityMessages = async (req, res) => {
   try {
     const community = await Community.findById(req.params.communityId).populate("messages.user", "username");
     if (!community) {
@@ -50,7 +49,7 @@ exports.getCommunityMessages = async (req, res) => {
   }
 };
 
-exports.sendCommunityMessage = async (req, res) => {
+module.exports.sendCommunityMessage = async (req, res) => {
   try {
     const community = await Community.findById(req.params.communityId);
     if (!community) {
