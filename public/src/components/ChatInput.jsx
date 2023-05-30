@@ -31,13 +31,13 @@ export default function ChatInput({handleSendMsg}) {
     <Container>
       <div className="button-container">
         <div className="emoji">
-          <BsEmojiSmileFill onClick = {handleEmojiPickerHideShow}/> 
-          {showEmojiPicker && <Picker onEmojiClick={handleEmojiClick} /> // Usamos el emoji de react de la sonrisa para abrir el menu del Picker
+          <BsEmojiSmileFill onClick={handleEmojiPickerHideShow}/> 
+          {showEmojiPicker && <Picker onEmojiClick={handleEmojiClick}/> // Usamos el emoji de react de la sonrisa para abrir el menu del Picker
           }
         </div>
       </div>
       <form className="input-container" onSubmit={(e) => sendChat(e)}>
-        <input type="text" placeholder="Escribe tu mensaje aqui" value={msg} onChange={(e) => setMsg(e.target.value) }/>
+        <input type="text" placeholder="Escribe tu mensaje aqui" value={msg} onChange={(e) => setMsg(e.target.value) } />
         <button className="submit">
           <IoMdSend />
         </button>
@@ -74,6 +74,7 @@ const Container = styled.div`
         background-color: #080420;
         box-shadow: 0 5px 10px #9a86f3;
         border-color: #9a86f3;
+        
         .emoji-scroll-wrapper::-webkit-scrollbar {
           background-color: #080420;
           width: 5px;
@@ -89,6 +90,7 @@ const Container = styled.div`
         .emoji-search {
           background-color: transparent;
           border-color: #9a86f3;
+          color: #d1d1d1;
         }
         .emoji-group:before {
           background-color: #080420;

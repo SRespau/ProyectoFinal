@@ -1,24 +1,14 @@
 import React, { useState, useEffect} from "react";
 import styled from "styled-components";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Logo from "../assets/logo2.png";
 import {ToastContainer, toast} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import axios from "axios";
-import { registerRoute } from "../utils/APIRoutes";
+import { userEditRoute, getUserRoute } from "../utils/APIRoutes";
 
 
-function Register () {
-  const navigate = useNavigate(); // Utiliza una función para poder utilizar navigate en un useEffect y poder redireccionar
-
-  // Los states digamos que son como un objeto. Contiene información que se puede guardar y modificar. Una vez cambia el state se vuelve a renderizar
-  // En este caso estamos guardando un objeto con 4 propiedades en "values"
-  const [values, setValues] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+function UserEdit () {
 
   const toastOptions = {
     position: "bottom-right",
@@ -27,31 +17,64 @@ function Register () {
     draggable: true,
     theme: "dark",
   };
+  
+  const navigate = useNavigate();
+  const location = useLocation();  
+  const { user } = location.state; 
+    
 
-  useEffect(() => {
-    // Obtendrá el objeto "chat-app-user" del localStorage
-    // En este caso si localiza el objeto significa que estamos logueados. Redirige a "/" de la web
-    if(localStorage.getItem("chat-app-user")){
-      navigate("/");
-    }
+  const [changePassword, setChangePassword] = useState(false);
+  const [values, setValues] = useState({
+    username: "",
+    nombre: "",
+    apellidos: "",
+    direccion: "",
+    telefono: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
 
-  // async y await es similar que .then() pero con menos codigo. Se hace asincrona y espera que le llegue una respuesta
-  // una vez le llega la respuesta hace el await. Con axios conectaremos con el servidor node.js y mandaremos datos por post
-  const handleSubmit = async (event) => { // Con "event" en onSubmit capturamos el evento de darle al boton de subir y lo tratamos
-    event.preventDefault(); // Al hacer submit la pagina se refrescaría. Con esto evitamos que el navegador refresque la pestaña
+
+  useEffect(() => {     
+    const execute = async () => { 
+      try {
+          const data = await axios.get(`${getUserRoute}/${user.currentUser._id}`);
+          
+          setValues({ 
+            username: data.data[0].username, 
+            email: data.data[0].email,
+            nombre: data.data[0].nombre,
+            apellidos: data.data[0].apellidos,
+            direccion: data.data[0].direccion,
+            telefono: data.data[0].telefono, 
+            password: "",
+          });
+      } catch (error) {
+          console.log(error);
+      }
+    }                     
+    execute();
+  }, [user.currentUser._id]);
+             
+
+  const handleSubmit = async (event) => {
+    event.preventDefault(); 
+
     if(handleValidation()){
       const { password, username, email, nombre, apellidos, direccion, telefono } = values;
-      const { data } = await axios.post(registerRoute, {
+      const id = user.currentUser._id;
+      const { data } = await axios.post(userEditRoute, {
+        id,
         username,
-        email,
-        password,
         nombre,
         apellidos,
         direccion,
         telefono,
-      }); // Mandamos por post los datos a la ruta designada en APIRoutes.js
-
+        email,
+        password,
+      });
+      
       // Si los datos son erroneos que salga error
       // Si los datos son correctos que cree un archivo en local llamado "chat-app-user" y le pase un json con los datos del user
       // Luego que nos lleve a "/" de nuestra pagina
@@ -64,28 +87,34 @@ function Register () {
       }
     };
   };
-  
+
+  // Toast es de componente toastify para alertas. Entre llaves se le pasan opciones complementarias
   const handleValidation = () => {
-    const { password, confirmPassword, username, email } = values; 
-    const strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})");
+    const { password, confirmPassword, username, email} = values; 
     if (username.length < 3) {
       toast.error("El usuario debería ser superior a 3 caracteres", toastOptions);
       return false;
     } else if (email === ""){
       toast.error("El email es requerido", toastOptions);
       return false;
-    } else if (!strongRegex.test(password)) {
-      toast.error('La contraseña debería contener 1 minuscula, 1 mayuscula, 1 número, 1 caracter especial (!, @, #, $, %, ^, &, *) y ser mayor de 8 caracteres', toastOptions);
+    } else if (changePassword && password.length < 8) {
+      toast.error("La contraseña debería ser superior a 8 caracteres", toastOptions);
       return false;
-    } else if (password !== confirmPassword){      
+    } else if (changePassword && password !== confirmPassword){      
       toast.error("Ambas contraseñas deben coincidir", toastOptions);
       return false;
     }
     return true;    
   };
-
+  // Aqui le decimos que el caracter que venga del evento lo escriba con setValues en el estado
+  // En el setValues cogeremos todo en values (...values), cogeremos el name del evento (atributo name del input) y cogeremos el value del input
+  // El nombre del input coincide con el nombre de la propiedad en el state, por lo que podemos usar esta forma para que se añada automaticamente.
   const handleChange = (event) => {
     setValues({ ...values, [event.target.name]: event.target.value });
+  };
+
+  const handleChangePassword = () => {
+    setChangePassword(changePassword => setChangePassword(!changePassword));
   };
 
   return (
@@ -96,19 +125,20 @@ function Register () {
             <img src={Logo} alt="logo" />
             <h1>Adamas</h1>
           </div>
-          <input className="user-info" type="text" placeholder="Usuario*" name="username" onChange={(e) => handleChange(e)} />
-          <input className="user-info" type="email" placeholder="Email*" name="email" onChange={(e) => handleChange(e)} />
+          <input className="user-info" type="text" value={values.nombre} placeholder="Nombre" name="nombre" onChange={(e) => handleChange(e)} />
+          <input className="user-info" type="text" value={values.apellidos} placeholder="Apellidos" name="apellidos" onChange={(e) => handleChange(e)} />
+          <input className="user-info" type="email" value={values.email} placeholder="Email*" name="email" onChange={(e) => handleChange(e)} />
+          <input className="user-info" type="text" value={values.telefono} placeholder="Telefono" name="telefono" onChange={(e) => handleChange(e)} />
+          <input className="user-info last" type="text" value={values.direccion} placeholder="Dirección" name="diireccion" onChange={(e) => handleChange(e)} />
+          
+          {changePassword && <>          
+            <input className="user-info" type="password" placeholder="Contraseña" name="password" onChange={(e) => handleChange(e)} />
+            <input className="user-info" type="password" placeholder="Confirmar Contraseña" name="confirmPassword" onChange={(e) => handleChange(e)} />
+          </>}
 
-          <input className="user-info" type="text" placeholder="Nombre" name="nombre" onChange={(e) => handleChange(e)} />
-          <input className="user-info" type="text" placeholder="Apellidos" name="apellidos" onChange={(e) => handleChange(e)} />
-          <input className="user-info" type="text" placeholder="Dirección" name="direccion" onChange={(e) => handleChange(e)} />
-          <input className="user-info" type="text" placeholder="Telefono" name="telefono" onChange={(e) => handleChange(e)} />
-
-          <input className="user-info" type="password" placeholder="Contraseña*" name="password" onChange={(e) => handleChange(e)} />
-          <input className="user-info" type="password" placeholder="Confirmar Contraseña*" name="confirmPassword" onChange={(e) => handleChange(e)} />
-          <button className="create" type="submit">Crear Usuario</button>
+          <button type="button" onClick={handleChangePassword}>Cambiar Contraseña</button>
+          <button type="submit">Editar Usuario</button>
           <Link to="/">Cancelar</Link>
-          <span>Si ya tienes un usuario..... <Link to="/login">Login</Link></span>
         </form>
       </FormContainer>
       <ToastContainer />
@@ -184,28 +214,20 @@ const FormContainer = styled.div`
       &:hover{
         background-color: #4e0eff;
       }
-      
     }
-    .create{
-      margin: 0rem 1rem;
+    .cancel {
+      margin: 0px 16rem;
     }
     span{
       color: white;
       text-transform: uppercase;
-      font-size: 1.2rem;
       a{
-        color: #d1d1d1;
+        color: #4e0eff;
         text-decoration: none;
         font-weight: bold;
-        margin-left: 1.2rem;
       }
-    }    
-  }
-  a{
-    color: #4e0eff;
-    text-decoration: none;
-    font-weight: bold;
+    }
   }
 `;
 
-export default Register;
+export default UserEdit;

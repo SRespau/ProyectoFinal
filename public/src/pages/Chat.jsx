@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { allUsersRoute, host } from "../utils/APIRoutes";
+import { allUsersRoute, allCommunities, host } from "../utils/APIRoutes";
 import Contacts from "../components/Contacts";
 import Welcome from "../components/Welcome";
 import ChatContainer from "../components/ChatContainer";
@@ -14,9 +14,11 @@ function Chat () {
   const [communities, setCommunities] = useState([]);
   const [currentUser, setCurrentUser] = useState(undefined);
   const [currentChat, setCurrentChat] = useState(undefined);
+  const [isUser, setIsUser] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
   const navigate = useNavigate();
 
+  
   // Se puede hacer tantos useEffect como queramos, solo seguir el flujo
   // Se usa una vez el componente se ha creado. En este caso "chat"
   useEffect(() => {
@@ -31,12 +33,20 @@ function Chat () {
     }
   }, [navigate]);
 
+
   useEffect(() =>{
     if(currentUser){
-      socket.current = io(host);
+      if(!socket.current) { // Ambos por chatGPT. El original era sin el if. lo de detro se saca fuera
+        socket.current = io(host);       
+      }      
       socket.current.emit("add-user", currentUser._id);
     }
-  }, [currentUser]);
+    
+    if(currentChat !== undefined && currentChat.hasOwnProperty("name")){      
+      socket.current.emit('join_room', { currentUser, currentChat });        
+      };      
+  }, [currentUser, currentChat]);
+  
   // Este useEffect lo que comprobará es primero si hay un usuario logeado
   // Si lo hay comprobará si el avatar lo tiene puesto o no. Si no lo tiene ira a la pagina SetAvatar
   // Si tiene la imagen puesta obtendrá todos los contactos y los metera en el state contacts
@@ -48,8 +58,10 @@ function Chat () {
             try {
                 const data = await axios.get(`${allUsersRoute}/${currentUser._id}`);
                 setContacts(data.data);
-                const communities = await axios.get(`${allUsersRoute}/${currentUser._id}`);
-                setContacts(communities.data);
+                
+                const communitiesData = await axios.get(allCommunities);
+                setCommunities(communitiesData.data);                            
+                              
             } catch (error) {
                 console.log(error);
             }
@@ -67,14 +79,18 @@ function Chat () {
     setCurrentChat(chat);
   };
 
+  const handleIsUser = (type) => {
+    setIsUser(type);
+  };
+
   return (
     <Container>
       <div className="container">
-        <Contacts contacts={contacts} currentUser={currentUser} changeChat={handleChatChange}></Contacts>
+        <Contacts contacts={contacts} currentUser={currentUser} changeChat={handleChatChange} communities={communities} changeIsUser={handleIsUser}></Contacts>
         { isLoaded && currentChat === undefined ? ( // Si state currentChat es undefined que aparezca el componente Welcome. Sino que aparezca el contenedor chatContainer      
           <Welcome currentUser={ currentUser }/>
           ) : (                   
-            <ChatContainer currentChat={ currentChat } currentUser={ currentUser } socket={socket}/>
+            <ChatContainer currentChat={ currentChat } currentUser={ currentUser } socket={socket} isUser={ isUser }/>
           )
         }
       </div>      

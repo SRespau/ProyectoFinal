@@ -1,25 +1,22 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import Logo from "../assets/logo.svg";
+import Logo from "../assets/logo2.png";
 import ContactButtons from "./ContactButtons";
-// Chat GPT
-import { getUsers } from '../controllers/userController';
-import { getCommunities } from '../controllers/communityController';
+import { Link } from "react-router-dom";
+
 
 // La función recibe como props los contactos y el usuario actual
-export default function Contacts({ contacts, currentUser, changeChat }) {
-  
+export default function Contacts({ contacts, currentUser, changeChat, communities, changeIsUser }) {  
   const [currentUserName, setCurrentUserName] = useState(undefined);
   const [currentUserImage, setCurrentUserImage] = useState(undefined);
   const [currentSelected, setCurrentSelected] = useState(undefined);
-  // ChatGPT
   const [selectedTab, setSelectedTab] = useState("users");
 
-  
-
-  const handleClick = (tab) => {
+  const changeTab = (tab) => {
     setSelectedTab(tab);
+    tab === "users" ? changeIsUser(true) : changeIsUser(false)
   };
+  
   
   useEffect(() => {
     if(currentUser) {
@@ -30,9 +27,9 @@ export default function Contacts({ contacts, currentUser, changeChat }) {
 
   const changeCurrentChat = (index, contact) => {
     setCurrentSelected(index);
-    changeChat(contact);
-  }
-  // DEBAJO DE CONTACT BUTTONS HABRÍA QUE HACER UNA CONDICIONAL. SI SE PRETA UN BOTON QUE SALGAN LOS USUARIOS Y SI NO LAS COMUNIDADES
+    changeChat(contact);      
+  }; 
+  
   return (
     <>
       {
@@ -40,11 +37,13 @@ export default function Contacts({ contacts, currentUser, changeChat }) {
           <Container>
             <div className="brand">
               <img src={Logo} alt="logo" />
-              <h3>Adamas</h3>
+              <h3>ADAMAS</h3>
             </div>
-            <ContactButtons />
+            <ContactButtons tabState={changeTab} currentUser={currentUser}/>
             <div className="contacts">
+
               {
+              selectedTab === "users" ?
                contacts.map((contact, index) => {
                 return (
                   <div className={`contact ${index === currentSelected ? "selected" : ""}`} key={index} onClick={() => changeCurrentChat(index, contact)}>
@@ -58,6 +57,16 @@ export default function Contacts({ contacts, currentUser, changeChat }) {
                   </div>                 
                 );
                })
+               : communities.map((community, index) => {
+                return (
+                  <div className={`contact ${index === currentSelected ? "selected" : ""}`} key={index} onClick={() => changeCurrentChat(index, community)}>
+                    
+                    <div className="username">
+                      <h3>{community.name}</h3>
+                    </div>
+                  </div>                 
+                );
+               })                            
               }
               
             </div>
@@ -68,7 +77,7 @@ export default function Contacts({ contacts, currentUser, changeChat }) {
               </div>
 
               <div className="username">
-                <h2>{currentUserName}</h2>
+                <Link to="/userEdit" state={{ user: {currentUser} }}>{currentUserName}</Link>
               </div>
             </div>
             
@@ -81,7 +90,7 @@ export default function Contacts({ contacts, currentUser, changeChat }) {
 
 const Container = styled.div`
   display: grid;
-  grid-template-rows: 10% 7% 68% 15%;
+  grid-template-rows: 10% 12% 67% 11%;
   overflow: hidden;
   background-color: #080420;
   .brand {
@@ -146,12 +155,15 @@ const Container = styled.div`
     gap: 2rem;
     .avatar {
       img {
-        height: 4rem;
+        height: 3.5rem;
         max-inline-size: 100%;
       }
     }
     .username {
-      h2 {
+      a {
+        font-size: 1.5rem;
+        font-weigth: bold;
+        text-decoration: none;
         color: white;
       }
     }

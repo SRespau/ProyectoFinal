@@ -19,7 +19,19 @@ const userSchema = new mongoose.Schema({
     required: true,    
     mix: 50,
   },
-  isAvatarImageSet: { // Para el avatar del usuario
+  nombre: {
+    type: String,
+  },
+  apellidos: {
+    type: String,
+  },
+  direccion: {
+    type: String,
+  },
+  telefono: {
+    type: String,
+  },
+  isAvatarImageSet: { 
     type: Boolean,
     default: false,
   },

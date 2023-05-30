@@ -10,7 +10,7 @@ const brcrypt = require("bcrypt"); //Encriptación password
 // req.query -> se usa para buscar, filtrar, ordenar, paginaci´n.. Viene en la url como key=value "http://localhost:3000/animals?page=10"
 module.exports.register = async (req, res, next) => {
   try{
-    const { username, email, password } = req.body;
+    const { username, email, password, nombre, apellidos, direccion, telefono } = req.body;
 
     const usernameCheck = await User.findOne({ username }); // Busca en la base de datos, si existe el usuario devuelve true y manda error
     if(usernameCheck){
@@ -29,6 +29,10 @@ module.exports.register = async (req, res, next) => {
       email,
       username,
       password: hashedPassword,
+      nombre,
+      apellidos,
+      direccion,
+      telefono
     }); 
     delete user.password; // Borramos la contraseña establecida que no esta encriptada antes de enviar el aviso de que ha sido creado.
 
@@ -78,6 +82,23 @@ module.exports.setAvatar = async (req, res, next) => {
   }
 };
 
+module.exports.getUser = async (req, res, next) => {
+  try{
+    const user = await User.find({_id: req.params.id}).select([
+      "email",
+      "username",
+      "nombre",
+      "apellidos",
+      "direccion",
+      "telefono",
+      "avatarImage",      
+    ]);
+    return res.json(user);
+  }catch(ex){
+    next(ex);
+  }
+};
+
 // Backend para ver todos los contactos
 module.exports.getAllUsers = async (req, res, next) => {
   try{
@@ -95,4 +116,38 @@ module.exports.getAllUsers = async (req, res, next) => {
   }catch(ex){
     next(ex);
   }
-}
+};
+
+module.exports.userEdit = async (req, res, next) => {
+  try{
+    console.log(req.body);
+    console.log("En user Edit de server");
+    const userId = req.body.id;
+    let userData = {};
+
+    if(req.body.password !== ""){
+      const hashedPassword = await brcrypt.hash(req.body.password, 10);
+
+      userData = await User.findByIdAndUpdate(userId, {
+        nombre: req.body.nombre,
+        apellidos: req.body.apellidos,
+        direccion: req.body.direccion,
+        telefono: req.body.telefono,
+        email: req.body.email,
+        password: hashedPassword,
+      });
+    } else {      
+      userData = await User.findByIdAndUpdate(userId, {
+        nombre: req.body.nombre,
+        apellidos: req.body.apellidos,
+        direccion: req.body.direccion,
+        telefono: req.body.telefono,
+        email: req.body.email,
+      });
+    }
+    
+    return res.json({user: userData, status: true,});
+  }catch(ex){
+    next(ex);
+  }
+};

@@ -7,29 +7,32 @@ const communitySchema = new mongoose.Schema({
   },
   creator: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "User",    
     required: true
   },
   members: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "User",    
     required: true
   }],
   messages: [{
     user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      type: String, // aqui tenia mongoose.Schema.Types.ObjectId,
+      ref: "User",      
       required: true
     },
     message: {
       type: String,
       required: true
     },
-    date: {
+    createdAt: {
       type: Date,
       default: Date.now
     }
   }]
+},
+{
+  timestamps: true,
 });
 
 module.exports = mongoose.model("Community", communitySchema);

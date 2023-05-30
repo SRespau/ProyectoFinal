@@ -1,35 +1,41 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 
-const ContactButtons = ({ onClickUsers, onClickCommunities, onClickCreate }) => {
-  const [activeButton, setActiveButton] = useState("users");
+const ContactButtons = ({tabState, currentUser}) => {
 
-  const handleButtonClick = (buttonType) => {
-    setActiveButton(buttonType);
-  };
+  const [communityClicked, setCommunityClicked] = useState(false);
 
-  
+  function communityOpenHandler (){
+    tabState("communities");
+    setCommunityClicked(true);
+  }
+
+  function communityCloseHandler (){
+    tabState("users");
+    setCommunityClicked(false);
+  }
 
   return (
     <ButtonContainer>
       <Button
-        active={activeButton === "users"}
-        onClick={onClickUsers}
+        onClick = {communityCloseHandler}
       >
         Usuarios
       </Button>
       <Button
-        active={activeButton === "communities"}
-        onClick={onClickCommunities}
+        onClick = {communityOpenHandler}
       >
         Comunidades
       </Button>
-      <Button
-        active={activeButton === "createCommunity"}
-        onClick={onClickCreate}
-      >
-        +
-      </Button>
+      {
+        communityClicked ? 
+        <Button >
+          <Link to="/createCommunity" state={{ user: {currentUser} }}>Crear comunidad</Link>
+        </Button> 
+      : ""
+      }
+           
     </ButtonContainer>
   );
 };
@@ -38,23 +44,26 @@ export default ContactButtons;
 
 const ButtonContainer = styled.div`
   display: flex;
-  justify-content: center;    
+  justify-content: center; 
+  flex-wrap: wrap;   
 `;
 
 const Button = styled.button`
   height: 2rem;
   margin: 0 0.5rem;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.5rem;
   border: none;
   border-radius: 5px;
   font-size: 1rem;
   cursor: pointer;
-  background-color: ${(props) => (props.active ? "#007bff" : "#fff")};
-  color: ${(props) => (props.active ? "#fff" : "#000")};
-  box-shadow: ${(props) =>
-    props.active ? "0 0 0 2px #007bff" : "0 0 0 2px #ccc"};
-
+  background-color: #4e00ff;
+  color: #d1d1d1;
+  
   &:hover {
-    background-color: #ccc;
+    background-color: #3400aa;
+  }
+  a {
+    text-decoration: none;
+    color: #d1d1d1;
   }
 `;

@@ -4,6 +4,8 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Chat from "./pages/Chat";
 import SetAvatar from "./pages/setAvatar"
+import CreateCommunity from "./pages/CreateCommunity";
+import UserEdit from "./pages/UserEdit";
 
 // Con cada Route redirigiremos a una pagina (componente) en concreto gracias a "react-router-dom"
 export default function App() {
@@ -14,6 +16,8 @@ export default function App() {
         <Route path="/login" element={<Login />}/>
         <Route path="/setAvatar" element={<SetAvatar />}/>
         <Route path="/" element={<Chat />}/>
+        <Route path="/createCommunity" element={<CreateCommunity />} />
+        <Route path="/userEdit" element={<UserEdit />} />
       </Routes>
   </BrowserRouter>
   )  

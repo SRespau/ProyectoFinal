@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
-import Logo from "../assets/logo.svg";
+import Logo from "../assets/logo2.png";
 import {ToastContainer, toast} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import axios from "axios";
@@ -83,10 +83,10 @@ function Login () {
         <form onSubmit={(event) => handleSubmit(event)}>
           <div className="brand">
             <img src={Logo} alt="logo" />
-            <h1>snappy</h1>
+            <h1>Adamas</h1>
           </div>
-          <input type="text" placeholder="Username" name="username" onChange={(e) => handleChange(e)} min="3" />
-          <input type="password" placeholder="Password" name="password" onChange={(e) => handleChange(e)} />
+          <input type="text" placeholder="Usuario" name="username" onChange={(e) => handleChange(e)} min="3" />
+          <input type="password" placeholder="Contraseña" name="password" onChange={(e) => handleChange(e)} />
           <button type="submit">Login</button>
           <span>¿No tienes cuenta? <Link to="/register">Registro</Link></span>
         </form>
@@ -109,7 +109,7 @@ const FormContainer = styled.div`
     display:flex;
     align-items:center;
     gap: 1rem;
-    justifi-content:center;
+    justify-content:center;
     img{
       height: 5rem;
     }
@@ -133,7 +133,7 @@ const FormContainer = styled.div`
       color:white;
       width: 100%;
       font-size: 1rem;
-      &.focus{
+      &:focus{
         border: 0.1rem solid #997af0;
         outline: none;
       }

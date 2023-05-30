@@ -1,102 +1,178 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import axios from "axios";
-import { getAllMessagesRoute, sendMessageRoute } from "../utils/APIRoutes";
+import { getAllMessagesRoute, sendMessageRoute, allCommunityMsg, sendCommunityMsg } from "../utils/APIRoutes";
 import Logout from "./Logout";
 import ChatInput from "./ChatInput";
+import DeleteCommunity from "./DeleteCommunity";
 import { v4 as uuidv4 } from "uuid";
 
-export default function ChatCointainer({ currentChat, currentUser, socket }) {
+
+export default function ChatCointainer({ currentChat, currentUser, isUser, socket }) {
   
   const [messages, setMessages] = useState([]);
   const [arrivalMessage, setArrivalMessage] = useState();
+  const [messagesReceived, setMessagesReceived] = useState([]);
   const scrollRef = useRef();
 
-
+  
   useEffect(() => {    
     const execute = async () => {
       if(currentChat){
-        const response = await axios.post(getAllMessagesRoute, {
-          from: currentUser._id,
-          to: currentChat._id,
-          });        
-        setMessages(response.data); 
+        if(isUser){          
+          const response = await axios.post(getAllMessagesRoute, {
+            from: currentUser._id,
+            to: currentChat._id,
+            });      
+          setMessages(response.data); 
+        } else{
+          const response = await axios.post(allCommunityMsg, {
+              from: currentChat._id,
+            });        
+          setMessagesReceived(response.data);
+        }        
       }             
     };
    execute();
   }, [currentChat]);
 
-
+  
   const handleSendMsg = async (msg) => {
-    await axios.post(sendMessageRoute, {
-      from: currentUser._id,
-      to: currentChat._id,
-      message: msg,
-    });
-    socket.current.emit("send-msg", {
-      from: currentUser._id,
-      to: currentChat._id,
-      message: msg,
-    });
+    
+    if(isUser){
+      await axios.post(sendMessageRoute, {
+        from: currentUser._id,
+        to: currentChat._id,
+        message: msg,
+      });
+      socket.current.emit("send-msg", {
+        from: currentUser._id,
+        to: currentChat._id,
+        message: msg,
+      });
+  
+      const msgs = [...messages];
+      msgs.push({fromSelf: true, message: msg});
+      setMessages(msgs);
 
-    const msgs = [...messages];
-    msgs.push({fromSelf: true, message: msg});
-    setMessages(msgs);
+    } else {      
+      await axios.post(sendCommunityMsg, {
+        user: currentUser.username,
+        chat: currentChat._id,
+        message: msg,
+      });
+      socket.current.emit("send-msg-group", {
+        user: currentUser.username,
+        chat: currentChat.name,
+        message: msg,
+      });
+    }    
   };
 
-
   useEffect(() => {
-    if(socket.current){
+    
+    if(socket.current){      
       socket.current.on("msg-recieve", (msg) => {
-        setArrivalMessage({fromSelf: false, message: msg});
+        setArrivalMessage({fromSelf: false, message: msg});        
       });
+      
+      socket.current.on('receive_message', (data) => {
+        setArrivalMessage({
+            message: data.message,
+            user: data.user,
+          }          
+        );               
+      });      
     }
-  }, []);
+   
+  }, [socket]);
 
 
   useEffect(() => {
     arrivalMessage && setMessages((prev) => [...prev, arrivalMessage]);
   }, [arrivalMessage]);
 
+  useEffect(() => {    
+    arrivalMessage && setMessagesReceived((prev) => [...prev, arrivalMessage]);
+  }, [arrivalMessage]);
+
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, messagesReceived]);
 
-
+  const dateHandler = stringDate => {
+    const date = new Date(stringDate);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const hour = date.getHours();
+    const minutes = date.getMinutes();
+    
+    return day + "/" + month + "/" + year + "/ " + hour + ":" + minutes;
+    };
+  
+  
   return(
     <>
    { 
-   // Si hay un currentChat (que no sea undefined) que muestre el contenedor. Sino que no haga nada
     currentChat && (
     <Container>
-      <div className="chat-header">
-        <div className="user-details">
-          <div className="avatar">
-          <img src={`data:image/svg+xml;base64,${currentChat.avatarImage}`} alt="avatar" />
+      <div className={isUser ? "chat-header" : "chat-header-group"}>
+        {
+          isUser ?
+          <div className="user-details">
+            <div className="avatar">
+              {Object.hasOwn(currentChat, 'username') ? <img src={`data:image/svg+xml;base64,${currentChat.avatarImage}`} alt="avatar" /> : ""}
+            </div>
+            <div className="username">
+              <h3>{currentChat.username}</h3>
+            </div>
           </div>
-          <div className="username">
-            <h3>{currentChat.username}</h3>
+        : 
+        <div className="community-details">
+          <div className="community">
+            <h3>{currentChat.name}</h3>
           </div>
         </div>
+        }
+        {
+          !isUser && currentUser._id === currentChat.creator ? <DeleteCommunity chat={currentChat._id} /> : ""
+        }
         <Logout />
       </div>
-      <div className="chat-messages">
-        {messages.map((message) => {
+      <div className={`${isUser ? "chat-messages" : "chat-messages-group"}`}>
+        {
+        isUser ? 
+        messages.map((message) => {
           return (
             <div ref={scrollRef} key={uuidv4()}>
-              <div
-                className={`message ${
-                  message.fromSelf ? "sended" : "recieved"
-                }`}
-              >
+              <div className={`message ${message.fromSelf ? "sended" : "recieved"}`}>
                 <div className="content ">
+                  <p className="date fullWidth">{dateHandler(message.time)}</p>
                   <p>{message.message}</p>
                 </div>
               </div>
             </div>
           );
-        })}
+        })
+        :
+        messagesReceived.map((message) => {
+          return (
+            <div ref={scrollRef} key={uuidv4()}>
+              <div className="group">
+                <div className={`${message.user === currentUser.username ? "self" : "content"}`}>
+                  <p className="user">{message.user}</p>
+                  {
+                    message.user === "ChatBot" ? "" : <p className="date">{dateHandler(message.time)}</p>
+                  }                  
+                  <p>{message.message}</p>
+                </div>
+              </div>
+            </div>
+          );
+        })
+        }
       </div>
       <ChatInput handleSendMsg={handleSendMsg}/>
     </Container>
@@ -135,6 +211,23 @@ overflow: hidden;
     }
   }
 }
+.chat-header-group{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.2rem;
+  .community-details {
+    display: flex;
+    align-items: center;
+    gap: 1rem;    
+    .community{
+      h3{
+        color: white;
+        margin-left: 2rem;
+      }
+    }
+  }
+}
 .chat-messages {
   padding: 1rem 2rem;
   display: flex;
@@ -154,6 +247,31 @@ overflow: hidden;
     }
   }
 }
+.chat-messages-group {
+  padding: 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: auto;  
+    .content{
+      max-width: 100%;
+      overflow-wrap: break-word;
+      padding: 1rem;
+      font-size: 1.2rem;
+      border-radius: 1rem;
+      color: #d1d1d1;
+    }
+    .self{
+      max-width: 100%;
+      overflow-wrap: break-word;
+      padding: 1rem;
+      font-size: 1.2rem;
+      border-radius: 1rem;
+      background-color: #3E0068;
+      color: #d1d1d1;
+    }
+  
+}
 .sended {
   justify-content: flex-end;
   .content {
@@ -165,5 +283,32 @@ overflow: hidden;
   .content {
     background-color: #9900ff20;
   }
+}
+.group {
+  justify-content: flex-start;
+  .content {
+    background-color: #4f04ff21; 
+    width: 100%;
+  }
+}
+.user{
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: #35A661;
+  width: 45%;
+  display: inline-block;
+}
+
+.date {
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  color: #35A661;
+  width 55%;
+  display: inline-block;
+  text-align: right;
+}
+
+.fullWidth {
+  width: 100%;
 }
 `;
