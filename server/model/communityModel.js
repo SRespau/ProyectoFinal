@@ -17,7 +17,7 @@ const communitySchema = new mongoose.Schema({
   }],
   messages: [{
     user: {
-      type: String, // aqui tenia mongoose.Schema.Types.ObjectId,
+      type: String,
       ref: "User",      
       required: true
     },
