@@ -3,6 +3,8 @@ import styled from "styled-components";
 import axios from "axios";
 import { deleteOneCommunity } from "../utils/APIRoutes";
 import {ToastContainer, toast} from "react-toastify";
+import { confirmAlert } from 'react-confirm-alert';
+import '../confirmStyle/react-confirm-alert.css';
 
 export default function DeleteCommunity (chat) {
 
@@ -14,16 +16,34 @@ export default function DeleteCommunity (chat) {
     theme: "dark",
   };
 
-  const handleDelete = async () => {
-    const delay = ms => new Promise(res => setTimeout(res, ms));
-    const response = await axios.post(deleteOneCommunity, {      
-      id: chat,
+  const handleDelete = () => {
+    confirmAlert({
+      title: 'Borrado comunidad',      
+      message: 'Borraras todos los mensajes y usuarios del chat, ¿Quieres continuar?',
+      buttons: [
+        {
+          label: 'Si',
+          onClick: async () => {
+            const delay = ms => new Promise(res => setTimeout(res, ms));
+            const response = await axios.post(deleteOneCommunity, {      
+              id: chat,
+            });
+            toast.success('Comunidad borrada con éxito. Actualizando...', toastOptions);
+            await delay(2000);
+            
+            if(response.status === 200){
+              window.location.reload(false);
+            } 
+          }
+        },
+        {
+          label: 'No',          
+        }
+      ]
     });
-    toast.success('Comunidad borrada con éxito. Actualizando...', toastOptions);
-    await delay(2000);
-    if(response.status === 200){
-      window.location.reload(false);
-    }   
+   
+    
+
   };
 
   return (
@@ -50,6 +70,7 @@ const Button = styled.button`
   &:hover {
     background-color: #3400aa;
   }
+  
 `;
 
  

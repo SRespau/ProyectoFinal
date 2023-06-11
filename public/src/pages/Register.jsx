@@ -9,10 +9,8 @@ import { registerRoute } from "../utils/APIRoutes";
 
 
 function Register () {
-  const navigate = useNavigate(); // Utiliza una función para poder utilizar navigate en un useEffect y poder redireccionar
+  const navigate = useNavigate();
 
-  // Los states digamos que son como un objeto. Contiene información que se puede guardar y modificar. Una vez cambia el state se vuelve a renderizar
-  // En este caso estamos guardando un objeto con 4 propiedades en "values"
   const [values, setValues] = useState({
     username: "",
     email: "",
@@ -29,17 +27,13 @@ function Register () {
   };
 
   useEffect(() => {
-    // Obtendrá el objeto "chat-app-user" del localStorage
-    // En este caso si localiza el objeto significa que estamos logueados. Redirige a "/" de la web
     if(localStorage.getItem("chat-app-user")){
       navigate("/");
     }
   });
 
-  // async y await es similar que .then() pero con menos codigo. Se hace asincrona y espera que le llegue una respuesta
-  // una vez le llega la respuesta hace el await. Con axios conectaremos con el servidor node.js y mandaremos datos por post
-  const handleSubmit = async (event) => { // Con "event" en onSubmit capturamos el evento de darle al boton de subir y lo tratamos
-    event.preventDefault(); // Al hacer submit la pagina se refrescaría. Con esto evitamos que el navegador refresque la pestaña
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     if(handleValidation()){
       const { password, username, email, nombre, apellidos, direccion, telefono } = values;
       const { data } = await axios.post(registerRoute, {
@@ -50,16 +44,13 @@ function Register () {
         apellidos,
         direccion,
         telefono,
-      }); // Mandamos por post los datos a la ruta designada en APIRoutes.js
-
-      // Si los datos son erroneos que salga error
-      // Si los datos son correctos que cree un archivo en local llamado "chat-app-user" y le pase un json con los datos del user
-      // Luego que nos lleve a "/" de nuestra pagina
+      });
+      
       if(data.status === false){
         toast.error(data.msg, toastOptions);
       }
       if(data.status === true){
-        localStorage.setItem("chat-app-user", JSON.stringify(data.user)); // Si es verdadero, creará en localStorage un objeto (cookie) y le pasara en JSON el data.user (convertira el objeto en JSON con stringify)
+        localStorage.setItem("chat-app-user", JSON.stringify(data.user));
         navigate("/");
       }
     };

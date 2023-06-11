@@ -5,7 +5,6 @@ import ContactButtons from "./ContactButtons";
 import { Link } from "react-router-dom";
 
 
-// La función recibe como props los contactos y el usuario actual
 export default function Contacts({ contacts, currentUser, changeChat, communities, changeIsUser }) {  
   const [currentUserName, setCurrentUserName] = useState(undefined);
   const [currentUserImage, setCurrentUserImage] = useState(undefined);

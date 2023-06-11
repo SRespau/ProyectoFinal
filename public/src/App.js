@@ -7,7 +7,6 @@ import SetAvatar from "./pages/setAvatar"
 import CreateCommunity from "./pages/CreateCommunity";
 import UserEdit from "./pages/UserEdit";
 
-// Con cada Route redirigiremos a una pagina (componente) en concreto gracias a "react-router-dom"
 export default function App() {
   return (
     <BrowserRouter>

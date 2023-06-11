@@ -19,8 +19,6 @@ function Chat () {
   const navigate = useNavigate();
 
   
-  // Se puede hacer tantos useEffect como queramos, solo seguir el flujo
-  // Se usa una vez el componente se ha creado. En este caso "chat"
   useEffect(() => {
     if(!localStorage.getItem("chat-app-user")){
       navigate("/login");
@@ -34,9 +32,9 @@ function Chat () {
   }, [navigate]);
 
 
-  useEffect(() =>{
+  useEffect(() =>{    
     if(currentUser){
-      if(!socket.current) { // Ambos por chatGPT. El original era sin el if. lo de detro se saca fuera
+      if(!socket.current) {
         socket.current = io(host);       
       }      
       socket.current.emit("add-user", currentUser._id);
@@ -47,10 +45,6 @@ function Chat () {
       };      
   }, [currentUser, currentChat]);
   
-  // Este useEffect lo que comprobará es primero si hay un usuario logeado
-  // Si lo hay comprobará si el avatar lo tiene puesto o no. Si no lo tiene ira a la pagina SetAvatar
-  // Si tiene la imagen puesta obtendrá todos los contactos y los metera en el state contacts
-  // data.data -> 1º data es la función de axios, 2º data es la const data creada con los datos
   useEffect(() => {     
     if(currentUser){            
         if (currentUser.isAvatarImageSet){
@@ -70,9 +64,8 @@ function Chat () {
         } else{
           navigate("/setAvatar");
         }      
-    } // Quizá tenga que quitar navigate si no funciona, era para que no saliera error
-  }, [currentUser, navigate]); // Entre corchetes ponemos el Hook, las dependencias. 
-  // Si pusieramos por ejemplo un state, useEffect se cargaria dos vees, cuando la pagina renderiza y cuando el state se actualiza
+    } 
+  }, [currentUser, navigate]);
   
   
   const handleChatChange = (chat) => {
@@ -87,7 +80,7 @@ function Chat () {
     <Container>
       <div className="container">
         <Contacts contacts={contacts} currentUser={currentUser} changeChat={handleChatChange} communities={communities} changeIsUser={handleIsUser}></Contacts>
-        { isLoaded && currentChat === undefined ? ( // Si state currentChat es undefined que aparezca el componente Welcome. Sino que aparezca el contenedor chatContainer      
+        { isLoaded && currentChat === undefined ? (
           <Welcome currentUser={ currentUser }/>
           ) : (                   
             <ChatContainer currentChat={ currentChat } currentUser={ currentUser } socket={socket} isUser={ isUser }/>

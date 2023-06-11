@@ -53,8 +53,7 @@ module.exports.sendCommunityMessage = async (req, res) => {
     const community = await Community.findById(req.body.chat);
     if (!community) {
       return res.status(404).json({ message: "Comunidad no encontrada" });
-    }
-    console.log(req.body);
+    }    
     const { user, message } = req.body;
 
     community.messages.push({ user: user, message: message });
@@ -96,24 +95,3 @@ module.exports.deleteCommunity = async (req, res) => {
   }
 }
 
-// ESTE POR AHORA NO SE UTILIZA
-module.exports.joinCommunity = async (req, res) => {
-  try {
-    const community = await Community.findById(req.params.communityId);
-    if (!community) {
-      return res.status(404).json({ message: "Community not found" });
-    }
-
-    if (community.members.includes(req.user.id)) {
-      return res.status(400).json({ message: "Already a member" });
-    }
-
-    community.members.push(req.user.id);
-    await community.save();
-
-    res.status(200).json(community);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error interno del servidor" });
-  }
-};

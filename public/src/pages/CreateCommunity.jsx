@@ -12,10 +12,8 @@ function NewCommunity () {
   const location = useLocation();  
   const { user } = location.state; 
 
-  const navigate = useNavigate(); // Utiliza una función para poder utilizar navigate en un useEffect y poder redireccionar
+  const navigate = useNavigate();
 
-  // Los states digamos que son como un objeto. Contiene información que se puede guardar y modificar. Una vez cambia el state se vuelve a renderizar
-  // En este caso estamos guardando un objeto con 4 propiedades en "values"
   const [values, setValues] = useState({
     name: "",
     creator: user.currentUser._id,
@@ -34,10 +32,8 @@ function NewCommunity () {
     theme: "dark",
   };  
 
-  // async y await es similar que .then() pero con menos codigo. Se hace asincrona y espera que le llegue una respuesta
-  // una vez le llega la respuesta hace el await. Con axios conectaremos con el servidor node.js y mandaremos datos por post
-  const handleSubmit = async (event) => { // Con "event" en onSubmit capturamos el evento de darle al boton de subir y lo tratamos
-    event.preventDefault(); // Al hacer submit la pagina se refrescaría. Con esto evitamos que el navegador refresque la pestaña
+  const handleSubmit = async (event) => { 
+    event.preventDefault();
       const { name, creator, members, messages } = values;
       const { data } = await axios.post(createCommunity, {
         name,

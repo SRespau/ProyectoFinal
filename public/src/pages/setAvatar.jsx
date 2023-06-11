@@ -10,7 +10,6 @@ import { Buffer } from "buffer";
 
 export default function SetAvatar() {
 
-  // Pagina para generar avatares random
   const api = "https://api.multiavatar.com";
   
   const navigate = useNavigate();
@@ -39,15 +38,10 @@ export default function SetAvatar() {
     if(selectedAvatar === undefined){
       toast.error("Por favor, selecciona un avatar.", toastOptions);
     } else{
-      // Obtenemos el usuario del storage localhost una vez se ha registrado/logeado
-      // Mandamos mediante axios a la ruta que hay en APIRoutes al servidor con la id del usuario obtenido del storage y el avatar seleccionado
-      // Le metemos a avatars en array (por defecto esta establecida en array arriba) la imagen seleccionada que esta guardada en el state
       const user = await JSON.parse(localStorage.getItem("chat-app-user"));
       const { data } = await axios.post(`${setAvatarRoute}/${user._id}`,{
         image: avatars[selectedAvatar],
       });
-      //Comprueba si data ha sido creado/establecido
-      //Luego cambiamos valores del localStorage
       if(data.isSet){
         user.isAvatarImageSet = true;
         user.avatarImage = data.image;
@@ -67,23 +61,20 @@ export default function SetAvatar() {
     const buscarAvatar = async () => {
       for (let i = 0; i < 4; i++) {
         const image = await axios.get(`${api}/${Math.round(Math.random() * 1000)}`);
-        const buffer = new Buffer(image.data); // Coge el data de la imagen
+        const buffer = new Buffer(image.data);
         
-        data.push(buffer.toString("base64")); // Almacena en la array el data de la imagen en base64
+        data.push(buffer.toString("base64"));
       }
-      setAvatars(data); // Almacenamos en avatars el array generado con 4 avatares
+      setAvatars(data);
       setIsLoading(false);
     }
 
-    buscarAvatar().catch(console.error); // Tratamos posibles errores    
+    buscarAvatar().catch(console.error);    
   }, []);
 
   return (
     <>
-    { // isLoading: state que nos indica si estamos cargando o no. Esta enlacado con el useEffect de arriba. Hasta que no devuelva la pagina con axios las 4 imagenes no pondrá setIsLoading en false.
-    // En este caso lo que hacemos es decirle que SI esta cargando (state true), nos muestre una imagen con un gif para la espera de la carga de avatares
-    // Una vez termine de cargar (axios haya devuelto 4 imagenes con la iteración) ira al ":" de la condicional y cargará todo el bloque de avatares y botón
-    
+    {
       isLoading ? <Container>
         <img src={loader} alt="loader" className="loader"/>
       </Container> : (
@@ -93,10 +84,10 @@ export default function SetAvatar() {
           <h1>Elige un avatar como imagen de perfil</h1>
         </div>
         <div className="avatars">
-          {avatars.map((avatar,index) => { // Recorremos el array de avatares y cogemos su index y el avatar
+          {avatars.map((avatar,index) => {
             return (
               <div key={index} className={`avatar ${selectedAvatar === index ? "selected" : ""}`}>
-                <img src={`data:image/svg+xml;base64,${avatar}`} alt="avatar" // Transformamos los datos del array en base64 para que sea legible en src
+                <img src={`data:image/svg+xml;base64,${avatar}`} alt="avatar"
                   onClick={() => setSelectedAvatar(index)}
                 />
               </div>

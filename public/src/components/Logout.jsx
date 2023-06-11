@@ -1,13 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { BiPowerOff } from "react-icons/bi"; // Iconos react. Dependencia instalada
+import { BiPowerOff } from "react-icons/bi";
 
 export default function Logout() {
   const navigate = useNavigate();
 
   const handleClick = async () => {
-    localStorage.clear(); // Limpiara el localStorage para quitar el usuario
+    localStorage.clear();
     navigate("/login");
   }
 

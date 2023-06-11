@@ -1,16 +1,17 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import Picker from "emoji-picker-react"; // Dependencia para poner emojis
-import { IoMdSend } from "react-icons/io"; // Icono enviar
-import { BsEmojiSmileFill } from "react-icons/bs"; // Icono smile
+import Picker from "emoji-picker-react";
+import { IoMdSend } from "react-icons/io";
+import { BsEmojiSmileFill } from "react-icons/bs";
 
 
 export default function ChatInput({handleSendMsg}) {
+  
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [msg, setMsg] = useState("");
 
   const handleEmojiPickerHideShow = () => {
-    setShowEmojiPicker(!showEmojiPicker); // Hará lo contrario que tenga
+    setShowEmojiPicker(!showEmojiPicker);
   };
 
   const handleEmojiClick = (event, emojiObject) => {
@@ -32,7 +33,7 @@ export default function ChatInput({handleSendMsg}) {
       <div className="button-container">
         <div className="emoji">
           <BsEmojiSmileFill onClick={handleEmojiPickerHideShow}/> 
-          {showEmojiPicker && <Picker onEmojiClick={handleEmojiClick}/> // Usamos el emoji de react de la sonrisa para abrir el menu del Picker
+          {showEmojiPicker && <Picker onEmojiClick={handleEmojiClick}/>
           }
         </div>
       </div>

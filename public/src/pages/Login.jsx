@@ -24,41 +24,31 @@ function Login () {
     theme: "dark",
   };
 
-  // useEffect se realizará una vez el componente se ha cargado
   useEffect(() => {
-    // Obtendrá el objeto "chat-app-user" del localStorage
-    // En este caso si localiza el objeto significa que estamos logueados. Redirige a "/" de la web
     if(localStorage.getItem("chat-app-user")){
       navigate("/");
     }
-  }, []); // Si dejamos la dependencia del hook vacia le decimos que solo lo ejecute 1 vez al renderizar la pagina o componente
+  }, []);
 
-  // async y await es similar que .then() pero con menos codigo. Se hace asincrona y espera que le llegue una respuesta
-  // una vez le llega la respuesta hace el await. Con axios conectaremos con el servidor node.js y mandaremos datos por post
   const handleSubmit = async (event) => {
-    event.preventDefault(); // Al hacer submit la pagina se refrescaría. Con esto evitamos que el navegador refresque la pestaña
+    event.preventDefault();
     if(handleValidation()){
-      const { password, username } = values; // Obtenemos password y username del state values
+      const { password, username } = values;
       const { data } = await axios.post(loginRoute, {
         username,
         password,
-      }); // Mandamos por post los datos a la ruta designada en APIRoutes.js
-      // data en este caso será la respuesta que devuelva la conexión axios
+      });
 
-      // Si los datos son erroneos que salga error
-      // Si los datos son correctos que cree un archivo en local llamado "chat-app-user" y le pase un json con los datos del user
-      // Luego que nos lleve a "/" de nuestra pagina
       if(data.status === false){
         toast.error(data.msg, toastOptions);
       }
       if(data.status === true){
-        localStorage.setItem("chat-app-user", JSON.stringify(data.user)); //Que busque en json format
+        localStorage.setItem("chat-app-user", JSON.stringify(data.user));
         navigate("/");
       }
     };
   };
 
-  // Toast es de componente toastify para alertas. Entre llaves se le pasan opciones complementarias
   const handleValidation = () => {
     const { password, username} = values; 
     if (username.length === "") {
@@ -70,13 +60,11 @@ function Login () {
     }
     return true;    
   };
-  // Aqui le decimos que el caracter que venga del evento lo escriba con setValues en el estado
-  // En el setValues cogeremos todo en values (...values), cogeremos el name del evento (atributo name del input) y cogeremos el value del input
+
   const handleChange = (event) => {
     setValues({ ...values, [event.target.name]: event.target.value });
   };
 
-  // Con "event" en onSubmit capturamos el evento de darle al boton de subir y lo tratamos, enviandolo como propiedad a "handleSubmit"
   return (
     <>
       <FormContainer>

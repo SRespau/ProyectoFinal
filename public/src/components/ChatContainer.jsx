@@ -15,7 +15,6 @@ export default function ChatCointainer({ currentChat, currentUser, isUser, socke
   const [messagesReceived, setMessagesReceived] = useState([]);
   const scrollRef = useRef();
 
-  
   useEffect(() => {    
     const execute = async () => {
       if(currentChat){
@@ -49,10 +48,11 @@ export default function ChatCointainer({ currentChat, currentUser, isUser, socke
         from: currentUser._id,
         to: currentChat._id,
         message: msg,
-      });
-  
+        time: new Date(),
+      });  
+      
       const msgs = [...messages];
-      msgs.push({fromSelf: true, message: msg});
+      msgs.push({fromSelf: true, message: msg, time: new Date()});
       setMessages(msgs);
 
     } else {      
@@ -65,41 +65,50 @@ export default function ChatCointainer({ currentChat, currentUser, isUser, socke
         user: currentUser.username,
         chat: currentChat.name,
         message: msg,
+        time: new Date(),
       });
     }    
   };
 
   useEffect(() => {
     
-    if(socket.current){      
+    // COMPROBAR ESTA PARTE. MANDA MENSAJES AL USUARIO AUNQUE ESTE EN OTRO CHAT. COMPROBAR QUE SOLO ENVIE SI ESTÁ EN EL MISMO SOCKET ID
+    if(socket.current){ 
+      socket.current.off("msg-recieve");
+      socket.current.off("receive_message");
       socket.current.on("msg-recieve", (msg) => {
-        setArrivalMessage({fromSelf: false, message: msg});        
+        if (msg[2] === currentChat._id){
+          console.log(currentChat);
+          setArrivalMessage({fromSelf: false, message: msg[0], time: msg[1],});    
+        }       
       });
       
       socket.current.on('receive_message', (data) => {
         setArrivalMessage({
             message: data.message,
             user: data.user,
+            time: data.time,
           }          
         );               
       });      
     }
    
-  }, [socket]);
+  }, [socket, currentChat]);
 
 
   useEffect(() => {
-    arrivalMessage && setMessages((prev) => [...prev, arrivalMessage]);
+    arrivalMessage && setMessages((prev) => [...prev, arrivalMessage]);    
   }, [arrivalMessage]);
 
   useEffect(() => {    
-    arrivalMessage && setMessagesReceived((prev) => [...prev, arrivalMessage]);
+    arrivalMessage && setMessagesReceived((prev) => [...prev, arrivalMessage]);    
   }, [arrivalMessage]);
 
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, messagesReceived]);
+
 
   const dateHandler = stringDate => {
     const date = new Date(stringDate);
@@ -108,8 +117,12 @@ export default function ChatCointainer({ currentChat, currentUser, isUser, socke
     const year = date.getFullYear();
     const hour = date.getHours();
     const minutes = date.getMinutes();
+    let minutesFormat = minutes;
+    if(minutesFormat < 10){
+      minutesFormat = "0" + minutesFormat;
+    }
     
-    return day + "/" + month + "/" + year + "/ " + hour + ":" + minutes;
+    return day + "/" + month + "/" + year + "/ " + hour + ":" + minutesFormat;
     };
   
   

@@ -75,20 +75,17 @@ function UserEdit () {
         password,
       });
       
-      // Si los datos son erroneos que salga error
-      // Si los datos son correctos que cree un archivo en local llamado "chat-app-user" y le pase un json con los datos del user
-      // Luego que nos lleve a "/" de nuestra pagina
       if(data.status === false){
         toast.error(data.msg, toastOptions);
       }
       if(data.status === true){
-        localStorage.setItem("chat-app-user", JSON.stringify(data.user)); // Si es verdadero, creará en localStorage un objeto (cookie) y le pasara en JSON el data.user (convertira el objeto en JSON con stringify)
+        localStorage.setItem("chat-app-user", JSON.stringify(data.user));
         navigate("/");
       }
     };
   };
 
-  // Toast es de componente toastify para alertas. Entre llaves se le pasan opciones complementarias
+ 
   const handleValidation = () => {
     const { password, confirmPassword, username, email} = values; 
     if (username.length < 3) {
@@ -106,9 +103,7 @@ function UserEdit () {
     }
     return true;    
   };
-  // Aqui le decimos que el caracter que venga del evento lo escriba con setValues en el estado
-  // En el setValues cogeremos todo en values (...values), cogeremos el name del evento (atributo name del input) y cogeremos el value del input
-  // El nombre del input coincide con el nombre de la propiedad en el state, por lo que podemos usar esta forma para que se añada automaticamente.
+ 
   const handleChange = (event) => {
     setValues({ ...values, [event.target.name]: event.target.value });
   };
