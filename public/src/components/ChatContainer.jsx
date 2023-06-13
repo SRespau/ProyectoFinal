@@ -64,6 +64,7 @@ export default function ChatCointainer({ currentChat, currentUser, isUser, socke
       socket.current.emit("send-msg-group", {
         user: currentUser.username,
         chat: currentChat.name,
+        chatId: currentChat._id,
         message: msg,
         time: new Date(),
       });
@@ -72,26 +73,29 @@ export default function ChatCointainer({ currentChat, currentUser, isUser, socke
 
   useEffect(() => {
     
-    // COMPROBAR ESTA PARTE. MANDA MENSAJES AL USUARIO AUNQUE ESTE EN OTRO CHAT. COMPROBAR QUE SOLO ENVIE SI ESTÁ EN EL MISMO SOCKET ID
     if(socket.current){ 
       socket.current.off("msg-recieve");
       socket.current.off("receive_message");
+      
       socket.current.on("msg-recieve", (msg) => {
         if (msg[2] === currentChat._id){
-          console.log(currentChat);
           setArrivalMessage({fromSelf: false, message: msg[0], time: msg[1],});    
         }       
       });
       
       socket.current.on('receive_message', (data) => {
-        setArrivalMessage({
+        if(data.chatId === currentChat._id || data.communityId === currentChat._id){
+          setArrivalMessage({
             message: data.message,
             user: data.user,
             time: data.time,
-          }          
-        );               
-      });      
+          }); 
+        }
+                      
+      }); 
+          
     }
+    
    
   }, [socket, currentChat]);
 

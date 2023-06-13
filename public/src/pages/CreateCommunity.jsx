@@ -109,7 +109,7 @@ const FormContainer = styled.div`
       color:white;
       width: 100%;
       font-size: 1rem;
-      &.focus{
+      &:focus{
         border: 0.1rem solid #997af0;
         outline: none;
       }

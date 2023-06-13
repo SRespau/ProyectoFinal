@@ -6,6 +6,7 @@ import Chat from "./pages/Chat";
 import SetAvatar from "./pages/setAvatar"
 import CreateCommunity from "./pages/CreateCommunity";
 import UserEdit from "./pages/UserEdit";
+import ForgotPassword from "./pages/ForgotPassword";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="/" element={<Chat />}/>
         <Route path="/createCommunity" element={<CreateCommunity />} />
         <Route path="/userEdit" element={<UserEdit />} />
+        <Route path="/forgotPassword" element={<ForgotPassword />} />
       </Routes>
   </BrowserRouter>
   )  

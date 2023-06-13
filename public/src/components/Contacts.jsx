@@ -43,7 +43,7 @@ export default function Contacts({ contacts, currentUser, changeChat, communitie
 
               {
               selectedTab === "users" ?
-               contacts.map((contact, index) => {
+              contacts.sort((a,b) => a.username.localeCompare(b.username)).map((contact, index) => {
                 return (
                   <div className={`contact ${index === currentSelected ? "selected" : ""}`} key={index} onClick={() => changeCurrentChat(index, contact)}>
                     <div className="avatar">
@@ -56,7 +56,7 @@ export default function Contacts({ contacts, currentUser, changeChat, communitie
                   </div>                 
                 );
                })
-               : communities.map((community, index) => {
+               : communities.sort((a,b) => a.name.localeCompare(b.name)).map((community, index) => {
                 return (
                   <div className={`contact ${index === currentSelected ? "selected" : ""}`} key={index} onClick={() => changeCurrentChat(index, community)}>
                     

@@ -79,6 +79,15 @@ function Register () {
     setValues({ ...values, [event.target.name]: event.target.value });
   };
 
+  const showPassword = () => {
+    var pass = document.getElementById("password");
+  if (pass.type === "password") {
+    pass.type = "text";
+  } else {
+    pass.type = "password";
+  }
+  };
+
   return (
     <>
       <FormContainer>
@@ -95,8 +104,9 @@ function Register () {
           <input className="user-info" type="text" placeholder="Dirección" name="direccion" onChange={(e) => handleChange(e)} />
           <input className="user-info" type="text" placeholder="Telefono" name="telefono" onChange={(e) => handleChange(e)} />
 
-          <input className="user-info" type="password" placeholder="Contraseña*" name="password" onChange={(e) => handleChange(e)} />
+          <input className="user-info" type="password" placeholder="Contraseña*" name="password" id="password" onChange={(e) => handleChange(e)} />
           <input className="user-info" type="password" placeholder="Confirmar Contraseña*" name="confirmPassword" onChange={(e) => handleChange(e)} />
+          <div className="checkbox"><input type="checkbox" onClick={showPassword}/> <label>Mostrar contraseña</label></div>          
           <button className="create" type="submit">Crear Usuario</button>
           <Link to="/">Cancelar</Link>
           <span>Si ya tienes un usuario..... <Link to="/login">Login</Link></span>
@@ -148,11 +158,21 @@ const FormContainer = styled.div`
       color:white;
       width: 100%;
       font-size: 1rem;
-      width: 20rem;
+      width: 45%;
       &:focus{
         border: 0.1rem solid #997af0;
         outline: none;
       }
+    }
+    .checkbox{
+      width: 100%;
+      position: relative;
+      top: -20px;
+      left: 27px;
+      margin-bottom: -17px;
+    }
+    label{
+      color: white;
     }
     .last{
       width: 42rem;

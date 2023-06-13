@@ -77,6 +77,7 @@ function Login () {
           <input type="password" placeholder="Contraseña" name="password" onChange={(e) => handleChange(e)} />
           <button type="submit">Login</button>
           <span>¿No tienes cuenta? <Link to="/register">Registro</Link></span>
+          <div><Link to="/forgotPassword">¿Olvidaste la contraseña?</Link></div>
         </form>
       </FormContainer>
       <ToastContainer />
@@ -148,6 +149,20 @@ const FormContainer = styled.div`
         color: #4e0eff;
         text-decoration: none;
         font-weight: bold;
+      }
+      a:hover {
+        color: #997af0; 
+      }
+    }
+    div{
+      margin-top: -20px;
+      a{
+        color: #4e0eff;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      a:hover {
+        color: #997af0;
       }
     }
   }

@@ -4,6 +4,7 @@ export const registerRoute = `${host}/api/auth/register`;
 export const loginRoute = `${host}/api/auth/login`;
 export const setAvatarRoute = `${host}/api/auth/setAvatar`;
 export const getUserRoute = `${host}/api/auth/getUser`;
+export const getUserByEmailRoute = `${host}/api/auth/getUserByEmail`;
 export const allUsersRoute = `${host}/api/auth/allusers`;
 export const userEditRoute = `${host}/api/auth/userEdit`;
 export const sendMessageRoute = `${host}/api/messages/addmsg`;
@@ -14,4 +15,5 @@ export const joinCommunity = `${host}/api/communities/joinCommunity`;
 export const allCommunityMsg = `${host}/api/communities/getCommunityMsg`;
 export const sendCommunityMsg = `${host}/api/communities/sendCommunityMsg`;
 export const deleteOneCommunity = `${host}/api/communities/deleteCommunity`;
+export const sendEmailRoute = `${host}/api/auth/sendEmail`;
 

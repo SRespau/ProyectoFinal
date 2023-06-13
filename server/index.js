@@ -61,17 +61,14 @@ io.on("connection", (socket) => {
         
     socket.to(room).emit('receive_message', {
       message: `${username} se ha unido al chat`,
-      user: "ChatBot",  
+      user: "ChatBot",
+      communityId: data.currentChat._id,  
     });
 
-    chatRoom = room;
-    allUsers.push({ id: socket.id, username, room });
-    chatRoomUsers = allUsers.filter((user) => user.room === room);
-    socket.to(room).emit('chatroom_users', chatRoomUsers);
-    socket.emit('chatroom_users', chatRoomUsers);    
+       
   });
 
-  socket.on('send-msg-group', (data) => {    
+  socket.on('send-msg-group', (data) => {
     const room = data.chat;
     io.to(room).emit('receive_message', data);
   });  

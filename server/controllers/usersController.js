@@ -96,6 +96,19 @@ module.exports.getUser = async (req, res, next) => {
   }
 };
 
+module.exports.getUserByEmail = async (req, res, next) => {
+  try{
+    const email = req.body.email.email;
+    const user = await User.findOne({ email });    
+    if(!user){
+      return res.json({msg: "Email de usuario no encontrado", status: false});
+    }
+    return res.json(user);
+  }catch(ex){
+    next(ex);
+  }
+};
+
 module.exports.getAllUsers = async (req, res, next) => {
   try{
     const users = await User.find({_id:{ $ne: req.params.id }}).select([
